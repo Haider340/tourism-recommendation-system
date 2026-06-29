@@ -23,7 +23,21 @@ import random
 import time
 
 # Import custom modules
-from db_config import get_db_connection, init_database, DB_CONFIG
+from db_config import (
+    get_db_connection, 
+    init_database, 
+    register_user, 
+    login_user,
+    save_user_rating,
+    get_user_ratings,
+    add_to_wishlist,
+    get_user_wishlist,
+    get_destinations,
+    get_reviews,
+    save_itinerary,
+    add_expense,
+    get_user_expenses
+)
 import ollama
 
 # ========== PAGE CONFIGURATION ==========

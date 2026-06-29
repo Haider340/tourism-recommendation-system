@@ -1,0 +1,27 @@
+{
+  "num_destinations": 10000,
+  "num_users": 100,
+  "num_ratings": 150000,
+  "num_countries": 74,
+  "rating_density": 0.15,
+  "generated_date": "2026-06-21T18:25:29.043043",
+  "categories": [
+    "Landmark",
+    "Museum",
+    "Nature",
+    "Activity",
+    "Cultural",
+    "Food",
+    "Shopping"
+  ],
+  "user_profiles": [
+    "adventure_seeker",
+    "culture_lover",
+    "relaxation_seeker",
+    "budget_traveler",
+    "luxury_traveler",
+    "foodie",
+    "photographer",
+    "family_traveler"
+  ]
+}

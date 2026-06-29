@@ -1,0 +1,34 @@
+# Create .gitignore
+echo "# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.venv/
+*.pkl
+*.db
+*.sqlite3
+.DS_Store
+*.log
+.env
+*.csv
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.webp
+
+# Streamlit
+.streamlit/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Colab
+*.ipynb_checkpoints/
+" > .gitignore

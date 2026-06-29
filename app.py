@@ -593,7 +593,6 @@ def render_navbar():
     """, unsafe_allow_html=True)
     
     with st.container():
-        st.markdown('<div class="stNavbar">', unsafe_allow_html=True)
         cols = st.columns([1.5, 0.9, 1, 0.9, 0.9, 1, 1, 0.8, 0.8])
         
         with cols[0]:

@@ -589,8 +589,8 @@ def render_navbar():
                 st.session_state.current_page = "Home"
                 st.rerun()
         with cols[2]:
-            if st.button("🤖 AI Assistant", key="nav_ai", use_container_width=True):
-                st.session_state.current_page = "AI Assistant"
+            if st.button("🤖 bloomChat", key="nav_ai", use_container_width=True):
+                st.session_state.current_page = "bloomChat"
                 st.rerun()
         with cols[3]:
             if st.button("📋 My Trips", key="nav_trips", use_container_width=True):
@@ -664,7 +664,7 @@ def generate_tour_plan(prompt):
     try:
         # Check if Ollama is available
         if not check_ollama_status():
-            return f"""⚠️ **AI Assistant is not available**
+            return f"""⚠️ **bloomChat is not available**
 
 Please make sure:
 1. Your Colab notebook with Ollama is **RUNNING**
@@ -810,7 +810,7 @@ def render_homepage():
     with col2:
         if st.button("✨ Generate", use_container_width=True):
             if quick_prompt:
-                st.session_state.current_page = "AI Assistant"
+                st.session_state.current_page = "bloomChat"
                 st.session_state.quick_prompt = quick_prompt
                 st.rerun()
     
@@ -942,7 +942,7 @@ def render_all_destinations():
         st.info("No destinations found")
 
 def render_ai_assistant():
-    """AI Assistant page"""
+    """bloomChat page"""
     
     st.markdown("""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 30px; margin-bottom: 20px;">
@@ -955,9 +955,9 @@ def render_ai_assistant():
     ai_status = check_ollama_status()
     
     if not ai_status:
-        st.warning("⚠️ AI Assistant is not available. Please make sure Ollama is running.")
+        st.warning("⚠️ bloomChat is not available. Please make sure Ollama is running.")
         st.info("""
-        **To enable the AI Assistant:**
+        **To enable the bloomChat:**
         1. Open your Colab notebook
         2. Run the tunnel cell
         3. Copy the tunnel URL
@@ -970,7 +970,7 @@ def render_ai_assistant():
         st.caption(f"📋 **Current host:** `{get_ollama_host()}`")
         return
     
-    st.success(f"✅ AI Assistant is ready! Connected to `{get_ollama_host()}`")
+    st.success(f"✅ bloomChat is ready! Connected to `{get_ollama_host()}`")
     
     # Quick prompts
     st.markdown("### Quick Prompts")
@@ -1196,7 +1196,7 @@ def render_my_trips():
                         st.success("Trip deleted!")
                         st.rerun()
         else:
-            st.info("No saved trips yet. Go to AI Assistant to plan your first trip!")
+            st.info("No saved trips yet. Go to bloomChat to plan your first trip!")
 
 def render_expenses():
     """Expense tracker page"""
@@ -1341,7 +1341,7 @@ def main():
     # Page routing
     if st.session_state.current_page == "Home":
         render_homepage()
-    elif st.session_state.current_page == "AI Assistant":
+    elif st.session_state.current_page == "bloomChat":
         render_ai_assistant()
     elif st.session_state.current_page == "My Trips":
         render_my_trips()

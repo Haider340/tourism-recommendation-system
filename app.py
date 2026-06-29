@@ -1,5 +1,5 @@
 """
-TravelGenie - Complete Tourism Recommendation System
+journeyBloom - Complete Tourism Recommendation System
 SQLite Version - Works on Streamlit Cloud
 """
 
@@ -26,14 +26,14 @@ import ollama
 
 # ========== PAGE CONFIGURATION ==========
 st.set_page_config(
-    page_title="TravelGenie - Tourism Recommendation",
+    page_title="journeyBloom - Tourism Recommendation",
     page_icon="✈️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 # ========== DATABASE CONFIGURATION ==========
-DB_PATH = os.path.join(os.path.dirname(__file__), 'travelgenie.db')
+DB_PATH = os.path.join(os.path.dirname(__file__), 'journeyBloom.db')
 
 def get_db_connection():
     """Create and return a SQLite database connection"""
@@ -583,7 +583,7 @@ def render_navbar():
         cols = st.columns([1.5, 0.9, 1, 0.9, 0.9, 1, 1, 0.8, 0.8])
         
         with cols[0]:
-            st.markdown("**🌍 TravelGenie**")
+            st.markdown("**🌍 journeyBloom**")
         with cols[1]:
             if st.button("🏠 Home", key="nav_home", use_container_width=True):
                 st.session_state.current_page = "Home"
@@ -797,7 +797,7 @@ def render_homepage():
     else:
         st.markdown("""
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 40px; margin: 20px 0; text-align: center;">
-            <h1 style="color: white; font-size: 3rem;">✈️ Welcome to TravelGenie! 🌍</h1>
+            <h1 style="color: white; font-size: 3rem;">✈️ Welcome to journeyBloom! 🌍</h1>
             <p style="color: white; font-size: 1.2rem;">Your AI-Powered Travel Companion</p>
         </div>
         """, unsafe_allow_html=True)
@@ -1272,7 +1272,7 @@ def render_notifications():
 def show_login_page():
     """Display login and registration page"""
     
-    st.markdown("<h1 style='text-align: center;'>✈️ TravelGenie</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>✈️ journeyBloom</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center;'>Your AI-Powered Travel Companion</p>", unsafe_allow_html=True)
     st.markdown("---")
     

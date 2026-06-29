@@ -462,6 +462,20 @@ def mark_notification_read(notification_id):
 # ========== CUSTOM CSS ==========
 st.markdown("""
 <style>
+
+    /* Hide Streamlit toolbar and branding */
+    .stAppToolbar {
+        display: none !important;
+    }
+    #MainMenu {
+        visibility: hidden !important;
+    }
+    footer {
+        visibility: hidden !important;
+    }
+    header {
+        visibility: hidden !important;
+    }
     .main {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }

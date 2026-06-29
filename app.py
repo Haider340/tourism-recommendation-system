@@ -8,6 +8,7 @@ import streamlit as st
 from streamlit.components.v1 import html
 import pandas as pd
 import mysql.connector
+import sqlite3  # ← Add this import
 import bcrypt
 import json
 import os
@@ -174,46 +175,37 @@ if 'show_all_destinations' not in st.session_state:
 
 # ========== DATABASE FUNCTIONS ==========
 def check_login(username, password):
-    """Verify user credentials"""
+    """Verify user credentials - SQLite version"""
     conn = get_db_connection()
     if conn:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username, username))
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE username = ? OR email = ?", (username, username))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
         
         if user and bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
-            return user
+            # Convert Row object to dict
+            return dict(user)
     return None
 
-def register_user(username, email, password, full_name=None):
+def register_user(username, email, password):
     """Register a new user - SQLite version"""
     conn = get_db_connection()
-    if not conn:
-        return False, "Database connection failed"
-    
-    cursor = conn.cursor()
-    
-    try:
-        # Check if user already exists
-        cursor.execute("SELECT id FROM users WHERE username = ? OR email = ?", (username, email))
-        if cursor.fetchone():
-            return False, "Username or email already exists"
-        
-        # Hash password and insert
-        hashed_pw = hash_password(password)
-        cursor.execute(
-            "INSERT INTO users (username, email, password_hash, full_name) VALUES (?, ?, ?, ?)",
-            (username, email, hashed_pw, full_name)
-        )
-        conn.commit()
-        return True, "Registration successful! Please login."
-    except Exception as e:
-        return False, f"Database error: {e}"
-    finally:
-        cursor.close()
-        conn.close()
+    if conn:
+        cursor = conn.cursor()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        try:
+            cursor.execute(
+                "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)",
+                (username, email, hashed.decode('utf-8'))
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return True
+        except sqlite3.IntegrityError:
+            return False
     return False
 
 def get_destinations(limit=None, country=None):

@@ -951,18 +951,26 @@ def render_ai_assistant():
     </div>
     """, unsafe_allow_html=True)
     
-    if not check_ollama_status():
+    # Check AI status
+    ai_status = check_ollama_status()
+    
+    if not ai_status:
         st.warning("⚠️ AI Assistant is not available. Please make sure Ollama is running.")
         st.info("""
         **To enable the AI Assistant:**
-        1. Open a terminal
-        2. Run: `ollama serve`
-        3. Keep the terminal running
-        4. Refresh this page
+        1. Open your Colab notebook
+        2. Run the tunnel cell
+        3. Copy the tunnel URL
+        4. Set `OLLAMA_HOST` in Streamlit Cloud **Secrets**
+        5. Keep the notebook running
+        6. Refresh this page
         """)
+        
+        # Show current host (for debugging)
+        st.caption(f"📋 **Current host:** `{get_ollama_host()}`")
         return
     
-    st.success("✅ AI Assistant is ready! Ask me about any destination.")
+    st.success(f"✅ AI Assistant is ready! Connected to `{get_ollama_host()}`")
     
     # Quick prompts
     st.markdown("### Quick Prompts")

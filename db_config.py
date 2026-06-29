@@ -153,18 +153,23 @@ def register_user(username, email, password, full_name=None):
     cursor = conn.cursor()
     
     try:
+        # Check if user already exists
         cursor.execute("SELECT id FROM users WHERE username = ? OR email = ?", (username, email))
         if cursor.fetchone():
             return False, "Username or email already exists"
         
+        # Hash password and insert
         hashed_pw = hash_password(password)
         cursor.execute(
             "INSERT INTO users (username, email, password_hash, full_name) VALUES (?, ?, ?, ?)",
             (username, email, hashed_pw, full_name)
         )
         conn.commit()
+        
+        # Get the new user's ID
         user_id = cursor.lastrowid
         
+        # Add welcome notification
         cursor.execute(
             "INSERT INTO notifications (user_id, type, title, message) VALUES (?, ?, ?, ?)",
             (user_id, "info", "Welcome to TravelGenie!", "Start planning your dream trip!")
@@ -172,6 +177,8 @@ def register_user(username, email, password, full_name=None):
         conn.commit()
         
         return True, "Registration successful! Please login."
+    except sqlite3.IntegrityError:
+        return False, "Username or email already exists"
     except Exception as e:
         return False, f"Database error: {e}"
     finally:
@@ -196,6 +203,7 @@ def login_user(username, password):
         if not verify_password(password, user['password_hash']):
             return None, "Invalid password"
         
+        # Update last seen
         cursor.execute("UPDATE users SET last_seen = ? WHERE id = ?", (datetime.now(), user['id']))
         conn.commit()
         
@@ -215,10 +223,30 @@ def save_user_rating(user_id, destination_id, rating, destination_name, category
     cursor = conn.cursor()
     
     try:
+        # Check if review exists
         cursor.execute(
-            "INSERT INTO reviews (user_id, destination_id, rating, review_text) VALUES (?, ?, ?, ?) ON CONFLICT(user_id, destination_id) DO UPDATE SET rating = ?",
-            (user_id, destination_id, rating, "", rating)
+            "SELECT id FROM reviews WHERE user_id = ? AND destination_id = ?",
+            (user_id, destination_id)
         )
+        existing = cursor.fetchone()
+        
+        if existing:
+            cursor.execute(
+                "UPDATE reviews SET rating = ?, updated_at = ? WHERE user_id = ? AND destination_id = ?",
+                (rating, datetime.now(), user_id, destination_id)
+            )
+        else:
+            cursor.execute(
+                "INSERT INTO reviews (user_id, destination_id, rating, review_text) VALUES (?, ?, ?, ?)",
+                (user_id, destination_id, rating, "")
+            )
+        
+        # Update destination average rating
+        cursor.execute(
+            "UPDATE destinations SET avg_user_rating = (SELECT AVG(rating) FROM reviews WHERE destination_id = ?), total_reviews = (SELECT COUNT(*) FROM reviews WHERE destination_id = ?) WHERE id = ?",
+            (destination_id, destination_id, destination_id)
+        )
+        
         conn.commit()
         return True
     except Exception as e:
@@ -276,6 +304,8 @@ def add_to_wishlist(user_id, destination_id, notes=""):
         )
         conn.commit()
         return True
+    except sqlite3.IntegrityError:
+        return False
     except Exception as e:
         return False
     finally:
@@ -414,6 +444,63 @@ def get_user_expenses(user_id):
         return [dict(row) for row in results]
     except Exception as e:
         return []
+    finally:
+        cursor.close()
+        conn.close()
+
+def send_notification(user_id, title, message, notification_type="info"):
+    """Send notification to user"""
+    conn = get_db_connection()
+    if not conn:
+        return False
+    
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO notifications (user_id, type, title, message) VALUES (?, ?, ?, ?)",
+            (user_id, notification_type, title, message)
+        )
+        conn.commit()
+        return True
+    except Exception as e:
+        return False
+    finally:
+        cursor.close()
+        conn.close()
+
+def get_notifications(user_id):
+    """Get user notifications"""
+    conn = get_db_connection()
+    if not conn:
+        return []
+    
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "SELECT * FROM notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC",
+            (user_id,)
+        )
+        results = cursor.fetchall()
+        return [dict(row) for row in results]
+    except Exception as e:
+        return []
+    finally:
+        cursor.close()
+        conn.close()
+
+def mark_notification_read(notification_id):
+    """Mark notification as read"""
+    conn = get_db_connection()
+    if not conn:
+        return False
+    
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE notifications SET is_read = 1 WHERE id = ?", (notification_id,))
+        conn.commit()
+        return True
+    except Exception as e:
+        return False
     finally:
         cursor.close()
         conn.close()

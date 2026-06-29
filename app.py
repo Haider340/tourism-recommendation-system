@@ -187,23 +187,33 @@ def check_login(username, password):
             return user
     return None
 
-def register_user(username, email, password):
-    """Register a new user"""
+def register_user(username, email, password, full_name=None):
+    """Register a new user - SQLite version"""
     conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor()
-        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        try:
-            cursor.execute(
-                "INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
-                (username, email, hashed.decode('utf-8'))
-            )
-            conn.commit()
-            cursor.close()
-            conn.close()
-            return True
-        except mysql.connector.Error:
-            return False
+    if not conn:
+        return False, "Database connection failed"
+    
+    cursor = conn.cursor()
+    
+    try:
+        # Check if user already exists
+        cursor.execute("SELECT id FROM users WHERE username = ? OR email = ?", (username, email))
+        if cursor.fetchone():
+            return False, "Username or email already exists"
+        
+        # Hash password and insert
+        hashed_pw = hash_password(password)
+        cursor.execute(
+            "INSERT INTO users (username, email, password_hash, full_name) VALUES (?, ?, ?, ?)",
+            (username, email, hashed_pw, full_name)
+        )
+        conn.commit()
+        return True, "Registration successful! Please login."
+    except Exception as e:
+        return False, f"Database error: {e}"
+    finally:
+        cursor.close()
+        conn.close()
     return False
 
 def get_destinations(limit=None, country=None):
